@@ -4,15 +4,14 @@ import { useLocalSearchParams, router } from "expo-router";
 import Screen from "@shared/components/Screen";
 import Button from "@shared/components/Button";
 import BoolField from "@features/inspection/components/BoolField";
-import KmInput from "@features/inspection/components/KmInput";
 import { getByDate } from "@features/inspection/services/inspectionStorage";
 import { upsertInspection } from "@features/inspection/usecases/upsertEntry";
-import { monthLocalISO, toLocalISO } from "@shared/utils/date";
+import { todayLocalISO, monthFromYmd } from "@shared/utils/date";
 
 export default function FormScreen() {
   const params = useLocalSearchParams<{ date?: string }>();
-  const date = params.date ? String(params.date) : toLocalISO(new Date());
-  const month = monthLocalISO(new Date(date as string)); // YYYY-MM local
+const date = params.date ? String(params.date) : todayLocalISO();
+const month = monthFromYmd(date); // solo corta "YYYY-MM"
 
   const [loading, setLoading] = useState(true);
 
@@ -86,7 +85,7 @@ export default function FormScreen() {
   }, [date]);
 
   const handleGuardar = async () => {
-    
+
     await upsertInspection(date, {
       month, // <- se guarda mes local YYYY-MM
 
@@ -114,7 +113,7 @@ export default function FormScreen() {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>Formulario del día</Text>
-      <Text style={styles.subtitle}>{toLocalISO(new Date(date))}</Text>
+      <Text style={styles.subtitle}>{date}</Text>
 
       {/* Antes de la operación */}
       <Pressable style={styles.card}>
