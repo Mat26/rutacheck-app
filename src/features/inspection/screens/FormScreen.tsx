@@ -58,13 +58,6 @@ export default function FormScreen() {
     (async () => {
       const existing = await getByDate(date);
       if (existing) {
-        // Interior
-        setPitoReversa(existing.pitoReversa);
-        setTimon(existing.timon);
-        setCinturon(existing.cinturones);
-        setMartillos(existing.martillos);
-        setKilometraje(String(existing.kilometraje));
-
         // Llantas
         setLlantasPresion(!!existing.llantasPresion);
         setLlantasObjetos(!!existing.llantasObjetos);
@@ -109,9 +102,6 @@ export default function FormScreen() {
     await upsertInspection(date, {
       month, // <- se guarda mes local YYYY-MM
 
-      // Interior existente
-      pitoReversa, timon, cinturones: cinturon, martillos, kilometraje: kmNum,
-
       // Llantas
       llantasPresion, llantasObjetos, llantasTuercas,
       // Fugas
@@ -137,16 +127,6 @@ export default function FormScreen() {
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>Formulario del día</Text>
       <Text style={styles.subtitle}>{toLocalISO(new Date(date))}</Text>
-
-      {/* Interior vehículo (lo previo) */}
-      <Pressable style={styles.card}>
-        <Text style={styles.sectionTitle}>Interior Vehículo</Text>
-        <BoolField label="Pito reversa" value={pitoReversa} onChange={setPitoReversa} />
-        <BoolField label="Timón" value={timon} onChange={setTimon} />
-        <BoolField label="Cinturón en cada puesto" value={cinturon} onChange={setCinturon} />
-        <BoolField label="Presencia de martillos" value={martillos} onChange={setMartillos} />
-        <KmInput value={kilometraje} onChange={setKilometraje} />
-      </Pressable>
 
       {/* Antes de la operación */}
       <Pressable style={styles.card}>
