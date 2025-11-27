@@ -15,6 +15,7 @@ export default function RootLayout() {
       <Stack.Screen name="form/index"  options={{ title: "Formulario" }} />
       <Stack.Screen name="saved/index" options={{ title: "Info guardada" }} />
       <Stack.Screen name="profile/index" options={{ title: "Datos del vehículo" }} />
+      <Stack.Screen name="preview/index" options={{ title: "Vista previa del PDF" }} />
     </Stack>
   );
 }
