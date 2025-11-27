@@ -16,13 +16,6 @@ export default function FormScreen() {
 
   const [loading, setLoading] = useState(true);
 
-  // --- (lo que ya tenías) Interior Vehículo ---
-  const [pitoReversa, setPitoReversa] = useState(false);
-  const [timon, setTimon] = useState(false);
-  const [cinturon, setCinturon] = useState(false);
-  const [martillos, setMartillos] = useState(false);
-  const [kilometraje, setKilometraje] = useState("");
-
   // --- Antes de la operación ---
   // Llantas
   const [llantasPresion, setLlantasPresion] = useState(false);
@@ -93,12 +86,7 @@ export default function FormScreen() {
   }, [date]);
 
   const handleGuardar = async () => {
-    const kmNum = Number(kilometraje);
-    if (!kilometraje || Number.isNaN(kmNum) || kmNum < 0) {
-      alert("Ingresa un kilometraje válido.");
-      return;
-    }
-
+    
     await upsertInspection(date, {
       month, // <- se guarda mes local YYYY-MM
 
