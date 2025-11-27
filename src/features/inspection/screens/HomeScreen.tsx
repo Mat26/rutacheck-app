@@ -44,6 +44,7 @@ export default function HomeScreen() {
         onPress={goToForm}
         variant="primary"
       />
+      <Button title="Datos del vehículo y conductor" onPress={() => router.push("/profile")} />
       <Button title="Ver info guardada" onPress={() => router.push("/saved")} variant="secondary" />
       <Button title="Generar PDF (mes actual)" onPress={handleGeneratePdf} variant="success" />
     </Screen>

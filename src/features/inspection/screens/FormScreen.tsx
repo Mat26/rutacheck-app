@@ -16,11 +16,6 @@ export default function FormScreen() {
 
   const [loading, setLoading] = useState(true);
 
-  // --- Información general ---
-  const [movil, setMovil] = useState("");
-  const [placas, setPlacas] = useState("");
-  const [conductorNombre, setConductorNombre] = useState("");
-
   // --- (lo que ya tenías) Interior Vehículo ---
   const [pitoReversa, setPitoReversa] = useState(false);
   const [timon, setTimon] = useState(false);
@@ -63,11 +58,6 @@ export default function FormScreen() {
     (async () => {
       const existing = await getByDate(date);
       if (existing) {
-        // General
-        setMovil(existing.movil ?? "");
-        setPlacas(existing.placas ?? "");
-        setConductorNombre(existing.conductorNombre ?? "");
-
         // Interior
         setPitoReversa(existing.pitoReversa);
         setTimon(existing.timon);
@@ -119,9 +109,6 @@ export default function FormScreen() {
     await upsertInspection(date, {
       month, // <- se guarda mes local YYYY-MM
 
-      // General
-      movil, placas, conductorNombre,
-
       // Interior existente
       pitoReversa, timon, cinturones: cinturon, martillos, kilometraje: kmNum,
 
@@ -150,16 +137,6 @@ export default function FormScreen() {
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>Formulario del día</Text>
       <Text style={styles.subtitle}>{toLocalISO(new Date(date))}</Text>
-
-      {/* Información general */}
-      <View style={styles.card}>
-        <Text style={styles.sectionTitle}>Información general</Text>
-
-        <LabeledInput label="Mes" value={month} editable={false} />
-        <LabeledInput label="Móvil" value={movil} onChangeText={setMovil} />
-        <LabeledInput label="Placas" value={placas} onChangeText={setPlacas} autoCapitalize="characters" />
-        <LabeledInput label="Nombre del conductor" value={conductorNombre} onChangeText={setConductorNombre} />
-      </View>
 
       {/* Interior vehículo (lo previo) */}
       <Pressable style={styles.card}>

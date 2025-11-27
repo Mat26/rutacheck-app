@@ -1,4 +1,5 @@
 import { InspectionEntry } from "@features/inspection/types/InspectionEntry";
+import { UserProfile } from "@features/profile/types/UserProfile";
 
 /** Utils de fecha */
 function parseMonth(month: string) {
@@ -108,10 +109,10 @@ function cellNum(v: number | undefined) {
 }
 
 /** Tabla de información general (encabezado) */
-function renderGeneralTable(latest: InspectionEntry | null, month: string) {
-  const movil = latest?.movil ?? "";
-  const placas = latest?.placas ?? "";
-  const conductor = latest?.conductorNombre ?? "";
+function renderGeneralTable(profile: UserProfile | null, month: string) {
+  const movil = profile?.movil ?? "";
+  const placas = profile?.placas ?? "";
+  const conductor = profile?.conductorNombre ?? "";
 
   return `
   <table class="kv kv-horizontal">
@@ -306,8 +307,7 @@ function styles(totalDays: number) {
 
 
 /** HTML principal del PDF mensual */
-export function buildMonthlyHtml(month: string, rows: InspectionEntry[]) {
-  const latest = pickLatest(rows);
+export function buildMonthlyHtml(month: string, rows: InspectionEntry[], profile: UserProfile | null) {
   const totalDays = daysInMonth(month);
 
   return `
@@ -322,7 +322,7 @@ export function buildMonthlyHtml(month: string, rows: InspectionEntry[]) {
     <div class="sheet">
       <h1>RutaCheck — ${month}</h1>
 
-      ${renderGeneralTable(latest, month)}
+      ${renderGeneralTable(profile, month)}
 
       ${renderMatrixTable(month, rows)}
     </div>
