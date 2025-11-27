@@ -8,13 +8,6 @@ export type InspectionEntry = {
   placas?: string;
   conductorNombre?: string;
 
-  // (Lo que ya tenías)
-  pitoReversa: boolean;
-  timon: boolean;
-  cinturones: boolean;
-  martillos: boolean;
-  kilometraje: number;
-
   // --- Antes de la operación ---
   // Llantas
   llantasPresion: boolean;

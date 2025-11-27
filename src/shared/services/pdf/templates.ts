@@ -49,14 +49,6 @@ function rowsDefinition(): RowDef[] {
   const rows: RowDef[] = [
     { kind: "section", label: "1-ANTES DE LA OPERACIÓN", align: "center"},
 
-    { kind: "section", label: "Interior Vehículo" },
-    { kind: "bool", label: "Pito reversa", pick: (e) => e.pitoReversa },
-    { kind: "bool", label: "Timón", pick: (e) => e.timon },
-    { kind: "bool", label: "Cinturón en cada puesto", pick: (e) => e.cinturones },
-    { kind: "bool", label: "Presencia de martillos", pick: (e) => e.martillos },
-
-    { kind: "number", label: "Kilometraje", pick: (e) => e.kilometraje },
-
     { kind: "section", label: "Antes de la operación — Llantas" },
     { kind: "bool", label: "Presión de aire", pick: (e) => e.llantasPresion },
     { kind: "bool", label: "Objetos incrustados", pick: (e) => e.llantasObjetos },

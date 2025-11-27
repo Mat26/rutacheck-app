@@ -23,13 +23,6 @@ export async function upsertInspection(date: string, data: InspectionDataInput) 
     placas: data.placas,
     conductorNombre: data.conductorNombre,
 
-    // existentes
-    pitoReversa: data.pitoReversa,
-    timon: data.timon,
-    cinturones: data.cinturones,
-    martillos: data.martillos,
-    kilometraje: data.kilometraje,
-
     // nuevas secciones
     llantasPresion: data.llantasPresion,
     llantasObjetos: data.llantasObjetos,
