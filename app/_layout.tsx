@@ -1,11 +1,15 @@
 import { Stack } from "expo-router";
+import { Platform } from "react-native";
 
 export default function RootLayout() {
+  const isWeb = Platform.OS === "web";
   return (
     <Stack
       screenOptions={{
         headerShadowVisible: false,
         headerTitleAlign: "center",
+        headerShown: true,               
+        headerBackVisible: !isWeb,         
       }}
     >
       {/* El grupo de tabs (Inicio) */}
