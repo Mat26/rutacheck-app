@@ -7,6 +7,7 @@ import BoolField from "@features/inspection/components/BoolField";
 import { getByDate } from "@features/inspection/services/inspectionStorage";
 import { upsertInspection } from "@features/inspection/usecases/upsertEntry";
 import { todayLocalISO, monthFromYmd } from "@shared/utils/date";
+import { isWeb } from "@shared/utils/platform";
 
 export default function FormScreen() {
   const params = useLocalSearchParams<{ date?: string }>();
@@ -157,7 +158,16 @@ const month = monthFromYmd(date); // solo corta "YYYY-MM"
       </Pressable>
 
       <Button title="Guardar" onPress={handleGuardar} />
-      <Button title="← Regresar" onPress={() => router.back()} variant="secondary" />
+      {isWeb && (
+        <Button
+          title="← Regresar"
+          onPress={() => {
+            if (router.canGoBack?.()) router.back();
+            else router.replace("/");
+          }}
+          variant="secondary"
+        />
+      )}
     </ScrollView>
   );
 }
