@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState } from "react";
 import { View, Text, StyleSheet, ActivityIndicator, Platform, Alert } from "react-native";
 import Screen from "@shared/components/Screen";
 import Button from "@shared/components/Button";
