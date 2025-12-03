@@ -1,32 +1,71 @@
 import { Pressable, Text, StyleSheet, ViewStyle } from "react-native";
 
+type Variant = "primary" | "secondary" | "success" | "danger" | "ghost"; // ⬅️ agrega ghost
+
 type Props = {
   title: string;
-  onPress: () => void;
-  variant?: "primary" | "secondary" | "success" | "danger";
+  onPress?: () => void;
+  variant?: Variant;
   style?: ViewStyle;
+  disabled?: boolean;
 };
 
-const colors: Record<NonNullable<Props["variant"]>, string> = {
-  primary: "#2563eb",
-  secondary: "#111827",
-  success: "#059669",
-  danger: "#ef4444",
-};
-
-export default function Button({ title, onPress, variant = "primary", style }: Props) {
+export default function Button({ title, onPress, variant = "primary", style, disabled }: Props) {
+  const vs = variantStyles[variant];
   return (
     <Pressable
-      accessibilityRole="button"
       onPress={onPress}
-      style={({ pressed }) => [styles.base, { backgroundColor: colors[variant] }, pressed && { opacity: 0.9 }, style]}
+      disabled={disabled}
+      style={({ pressed }) => [
+        styles.base,
+        vs.button,
+        pressed && !disabled && styles.pressed,
+        disabled && styles.disabled,
+        style,
+      ]}
     >
-      <Text style={styles.text}>{title}</Text>
+      <Text style={[styles.text, vs.text]}>{title}</Text>
     </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
-  base: { paddingHorizontal: 20, paddingVertical: 14, borderRadius: 12, alignItems: "center" },
-  text: { color: "#fff", fontSize: 16, fontWeight: "600" },
+  base: {
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
+    minWidth: 140,
+  },
+  text: { fontWeight: "700" },
+  pressed: { opacity: 0.85 },
+  disabled: { opacity: 0.6 },
 });
+
+const variantStyles = {
+  primary: {
+    button: { backgroundColor: "#2563eb" },
+    text: { color: "#fff" },
+  },
+  secondary: {
+    button: { backgroundColor: "#e5e7eb" },
+    text: { color: "#111827" },
+  },
+  success: {
+    button: { backgroundColor: "#16a34a" },
+    text: { color: "#fff" },
+  },
+  danger: {
+    button: { backgroundColor: "#dc2626" },
+    text: { color: "#fff" },
+  },
+  ghost: { // ⬅️ nuevo estilo
+    button: {
+      backgroundColor: "transparent",
+      borderWidth: 1,
+      borderColor: "#e5e7eb",
+    },
+    text: { color: "#374151" },
+  },
+} as const;
