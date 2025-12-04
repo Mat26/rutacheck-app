@@ -101,6 +101,10 @@ export default function HomeScreen() {
         title="Vista previa del PDF"
         onPress={() => router.push("/preview")}
       />
+      <Button
+        title="Recordatorio diario"
+        onPress={() => router.push("/reminder")}
+      />
     </Screen>
   );
 }
