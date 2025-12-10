@@ -8,15 +8,64 @@ import { getByDate } from "@features/inspection/services/inspectionStorage";
 import { upsertInspection } from "@features/inspection/usecases/upsertEntry";
 import { todayLocalISO, monthFromYmd } from "@shared/utils/date";
 import { isWeb } from "@shared/utils/platform";
+import type { InspectionEntry } from "@features/inspection/types/InspectionEntry";
+
+// ---------------- Nuevas secciones (definición de campos booleanos) ----------------
+type BoolKey = {
+  [K in keyof InspectionEntry]: InspectionEntry[K] extends boolean | undefined ? K : never
+}[keyof InspectionEntry];
+type BoolCfg = { key: BoolKey; label: string };
+
+// Funcionamiento Indicadores y luces
+const CFG_INDICADORES_LUCES: BoolCfg[] = [
+  { key: "indPresionAceite", label: "Presión de aceite" },
+  { key: "indCargaAlternador", label: "Carga alternador" },
+  { key: "indTempMotor", label: "Temperatura del motor" },
+  { key: "indPresionAireFrenos", label: "Presión de aire frenos" },
+  { key: "indIndicadorRevoluciones", label: "Indicador de revoluciones" },
+  { key: "indLucesPrincipales", label: "Luces principales" },
+  { key: "indLuzFreno", label: "Luz de freno" },
+  { key: "indDireccionales", label: "Luces direccionales" },
+  { key: "indLuzYPitoReversa", label: "Luz y pito de reversa" },
+  { key: "indLimpiabrisas", label: "Funcionamiento del limpiabrisas" },
+  { key: "indPito", label: "Pito" },
+  { key: "indControlVelocidad", label: "Dispositivo de conT de velocidad" },
+];
+
+// Revisión de documentación y elementos de seguridad
+const CFG_DOC_SEGURIDAD: BoolCfg[] = [
+  { key: "docFechasVigenciaOk", label: "Rev., porte y verificación de fechas (doc.)" },
+  { key: "docBotiquinOk", label: "Rev., porte y estado del botiquín" },
+  { key: "docExtintorOk", label: "Rev., porte y fecha de vencimiento extintor" },
+];
+
+// Durante la Operación
+const CFG_DURANTE: BoolCfg[] = [
+  { key: "opRuidosExtranos", label: "Ruidos extraños" },
+  { key: "opNovedadesIndicadores", label: "Novedades en los indicadores" },
+  { key: "opOtros", label: "Otros" },
+];
+
+// Después de la operación
+const CFG_DESPUES: BoolCfg[] = [
+  { key: "postLlantas", label: "Llantas" },
+  { key: "postLuces", label: "Luces" },
+  { key: "postFugas", label: "Fugas" },
+  { key: "postCorreas", label: "Correas" },
+  { key: "postEstadoGeneral", label: "Estado general del vehículo" },
+  { key: "postKilometrajeOk", label: "Kilometraje" },
+];
+
+// -----------------------------------------------------------------------------------
 
 export default function FormScreen() {
   const params = useLocalSearchParams<{ date?: string }>();
-const date = params.date ? String(params.date) : todayLocalISO();
-const month = monthFromYmd(date); // solo corta "YYYY-MM"
+  const date = params.date ? String(params.date) : todayLocalISO();
+  const month = monthFromYmd(date);
 
   const [loading, setLoading] = useState(true);
 
-  // --- Antes de la operación ---
+  // --- (Tu estado existente) Antes de la operación ---
   // Llantas
   const [llantasPresion, setLlantasPresion] = useState(false);
   const [llantasObjetos, setLlantasObjetos] = useState(false);
@@ -46,6 +95,12 @@ const month = monthFromYmd(date); // solo corta "YYYY-MM"
   const [revLucesBajas, setRevLucesBajas] = useState(false);
   const [revCocuyos, setRevCocuyos] = useState(false);
   const [revLuzBlanca, setRevLuzBlanca] = useState(false);
+
+  // --- (Nuevo) Estado compacto para las secciones adicionales ---
+  const [extraBools, setExtraBools] = useState<Partial<Record<BoolKey, boolean>>>({});
+
+  const setExtra = (key: BoolKey, val: boolean) =>
+    setExtraBools((prev) => ({ ...prev, [key]: val }));
 
   useEffect(() => {
     (async () => {
@@ -80,30 +135,36 @@ const month = monthFromYmd(date); // solo corta "YYYY-MM"
         setRevLucesBajas(!!existing.revLucesBajas);
         setRevCocuyos(!!existing.revCocuyos);
         setRevLuzBlanca(!!existing.revLuzBlanca);
+
+        // Nuevas secciones (carga masiva por config)
+        const next: Partial<Record<BoolKey, boolean>> = {};
+        for (const cfg of [
+          ...CFG_INDICADORES_LUCES,
+          ...CFG_DOC_SEGURIDAD,
+          ...CFG_DURANTE,
+          ...CFG_DESPUES,
+        ]) {
+          next[cfg.key] = !!(existing as any)[cfg.key];
+        }
+        setExtraBools(next);
       }
       setLoading(false);
     })();
   }, [date]);
 
   const handleGuardar = async () => {
-
     await upsertInspection(date, {
-      month, // <- se guarda mes local YYYY-MM
-
-      // Llantas
+      month, // YYYY-MM local
+      // (existentes)
       llantasPresion, llantasObjetos, llantasTuercas,
-      // Fugas
       fugasMotor, fugasCaja, fugasDiferencial, fugasCombustible,
-      // Niveles
       nivelMotor, nivelRefrigerante, nivelHidraulico, nivelFrenosEmbrague,
-      // Filtros
       filtrosEstado, filtrosFugas,
-      // Baterías
       bateriasBornes, bateriasEstado,
-      // Correas
       correasEstado, correasTension,
-      // Revisión interna
       revAseo, revLucesAltas, revLucesBajas, revCocuyos, revLuzBlanca,
+      // (nuevos) mezcla compacta
+      ...extraBools,
     });
 
     router.replace("/"); // volver a inicio
@@ -157,6 +218,58 @@ const month = monthFromYmd(date); // solo corta "YYYY-MM"
         <BoolField label="Luz blanca" value={revLuzBlanca} onChange={setRevLuzBlanca} />
       </Pressable>
 
+      {/* Funcionamiento Indicadores y luces */}
+      <Pressable style={styles.card}>
+        <Text style={styles.sectionTitle}>Funcionamiento Indicadores y luces</Text>
+        {CFG_INDICADORES_LUCES.map(({ key, label }) => (
+          <BoolField
+            key={String(key)}
+            label={label}
+            value={!!extraBools[key]}
+            onChange={(v) => setExtra(key, v)}
+          />
+        ))}
+      </Pressable>
+
+      {/* Revisión de documentación y elementos de seguridad */}
+      <Pressable style={styles.card}>
+        <Text style={styles.sectionTitle}>Revisión de documentación y elementos de seguridad</Text>
+        {CFG_DOC_SEGURIDAD.map(({ key, label }) => (
+          <BoolField
+            key={String(key)}
+            label={label}
+            value={!!extraBools[key]}
+            onChange={(v) => setExtra(key, v)}
+          />
+        ))}
+      </Pressable>
+
+      {/* Durante la Operación (título centrado) */}
+      <Pressable style={styles.card}>
+        <Text style={[styles.sectionTitle, styles.center]}>Durante la Operación</Text>
+        {CFG_DURANTE.map(({ key, label }) => (
+          <BoolField
+            key={String(key)}
+            label={label}
+            value={!!extraBools[key]}
+            onChange={(v) => setExtra(key, v)}
+          />
+        ))}
+      </Pressable>
+
+      {/* Después de la operación (título centrado) */}
+      <Pressable style={styles.card}>
+        <Text style={[styles.sectionTitle, styles.center]}>Después de la operación</Text>
+        {CFG_DESPUES.map(({ key, label }) => (
+          <BoolField
+            key={String(key)}
+            label={label}
+            value={!!extraBools[key]}
+            onChange={(v) => setExtra(key, v)}
+          />
+        ))}
+      </Pressable>
+
       <Button title="Guardar" onPress={handleGuardar} />
       {isWeb && (
         <Button
@@ -172,7 +285,7 @@ const month = monthFromYmd(date); // solo corta "YYYY-MM"
   );
 }
 
-/** Input simple con etiqueta (evita crear archivo nuevo por ahora) */
+/** Input simple con etiqueta (mantengo tu helper) */
 function LabeledInput({
   label,
   value,
@@ -208,6 +321,7 @@ const styles = StyleSheet.create({
   card: { marginTop: 12, padding: 16, backgroundColor: "#f3f4f6", borderRadius: 12, gap: 12 },
   sectionTitle: { fontSize: 18, fontWeight: "700", marginBottom: 4 },
   groupTitle: { fontSize: 16, fontWeight: "700", marginTop: 8 },
+  center: { textAlign: "center" },
 
   row: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 12 },
   label: { fontSize: 16, flex: 1 },

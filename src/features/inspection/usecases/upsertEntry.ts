@@ -5,58 +5,35 @@ function uid() {
   return Math.random().toString(36).slice(2, 10);
 }
 
+/**
+ * Permite enviar cualquier campo de InspectionEntry excepto los gestionados por el sistema.
+ * Así, cuando agregues nuevos booleanos al modelo, se guardarán automáticamente.
+ */
 export type InspectionDataInput = Omit<
   InspectionEntry,
   "id" | "date" | "month" | "createdAt" | "updatedAt"
-> & { month: string }; // exigimos month (lo calculas desde la fecha local)
+> & {
+  month: string;
+};
 
 export async function upsertInspection(date: string, data: InspectionDataInput) {
   const prev = await getByDate(date);
+  const now = Date.now();
 
-  const entry: InspectionEntry = {
+  // Construcción por merge:
+  // - Lo previo se mantiene
+  // - Lo nuevo pisa lo anterior
+  // - Campos de sistema se fijan aquí
+  const next: InspectionEntry = {
+    ...(prev ?? ({} as InspectionEntry)),
+    ...data,                          // << aquí entran TODOS los campos nuevos (ej. indPresionAceite, etc.)
     id: prev?.id ?? uid(),
     date,
     month: data.month,
-
-    // info general
-    movil: data.movil,
-    placas: data.placas,
-    conductorNombre: data.conductorNombre,
-
-    // nuevas secciones
-    llantasPresion: data.llantasPresion,
-    llantasObjetos: data.llantasObjetos,
-    llantasTuercas: data.llantasTuercas,
-
-    fugasMotor: data.fugasMotor,
-    fugasCaja: data.fugasCaja,
-    fugasDiferencial: data.fugasDiferencial,
-    fugasCombustible: data.fugasCombustible,
-
-    nivelMotor: data.nivelMotor,
-    nivelRefrigerante: data.nivelRefrigerante,
-    nivelHidraulico: data.nivelHidraulico,
-    nivelFrenosEmbrague: data.nivelFrenosEmbrague,
-
-    filtrosEstado: data.filtrosEstado,
-    filtrosFugas: data.filtrosFugas,
-
-    bateriasBornes: data.bateriasBornes,
-    bateriasEstado: data.bateriasEstado,
-
-    correasEstado: data.correasEstado,
-    correasTension: data.correasTension,
-
-    revAseo: data.revAseo,
-    revLucesAltas: data.revLucesAltas,
-    revLucesBajas: data.revLucesBajas,
-    revCocuyos: data.revCocuyos,
-    revLuzBlanca: data.revLuzBlanca,
-
-    createdAt: prev?.createdAt ?? Date.now(),
-    updatedAt: Date.now(),
+    createdAt: prev?.createdAt ?? now,
+    updatedAt: now,
   };
 
-  await upsertByDate(entry);
-  return entry;
+  await upsertByDate(next);
+  return next;
 }
