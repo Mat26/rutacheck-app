@@ -49,36 +49,36 @@ function rowsDefinition(): RowDef[] {
   const rows: RowDef[] = [
     { kind: "section", label: "1-ANTES DE LA OPERACIÓN", align: "center"},
 
-    { kind: "section", label: "Antes de la operación — Llantas" },
+    { kind: "section", label: "A. LLANTAS" },
     { kind: "bool", label: "Presión de aire", pick: (e) => e.llantasPresion },
     { kind: "bool", label: "Objetos incrustados", pick: (e) => e.llantasObjetos },
     { kind: "bool", label: "Estado de tuercas (completas y ajustadas)", pick: (e) => e.llantasTuercas },
 
-    { kind: "section", label: "Fugas" },
+    { kind: "section", label: "B. FUGAS" },
     { kind: "bool", label: "Motor", pick: (e) => e.fugasMotor },
     { kind: "bool", label: "Caja", pick: (e) => e.fugasCaja },
     { kind: "bool", label: "Diferencial", pick: (e) => e.fugasDiferencial },
     { kind: "bool", label: "Combustible", pick: (e) => e.fugasCombustible },
 
-    { kind: "section", label: "Niveles y tapas" },
+    { kind: "section", label: "C. NIVELES Y TAPAS" },
     { kind: "bool", label: "Motor", pick: (e) => e.nivelMotor },
     { kind: "bool", label: "Agua o refrigerante", pick: (e) => e.nivelRefrigerante },
     { kind: "bool", label: "Hidráulico", pick: (e) => e.nivelHidraulico },
     { kind: "bool", label: "Líquido de frenos o embrague", pick: (e) => e.nivelFrenosEmbrague },
 
-    { kind: "section", label: "Filtros" },
+    { kind: "section", label: "D. FILTROS" },
     { kind: "bool", label: "Estado", pick: (e) => e.filtrosEstado },
     { kind: "bool", label: "Fugas", pick: (e) => e.filtrosFugas },
 
-    { kind: "section", label: "Baterías" },
+    { kind: "section", label: "E. BATERÍAS" },
     { kind: "bool", label: "Bornes", pick: (e) => e.bateriasBornes },
     { kind: "bool", label: "Estado general", pick: (e) => e.bateriasEstado },
 
-    { kind: "section", label: "Correas" },
+    { kind: "section", label: "F. CORREAS" },
     { kind: "bool", label: "Estado", pick: (e) => e.correasEstado },
     { kind: "bool", label: "Tensión", pick: (e) => e.correasTension },
 
-    { kind: "section", label: "Revisión interna" },
+    { kind: "section", label: "G. REVISIÓN INTERNA" },
     { kind: "bool", label: "Aseo", pick: (e) => e.revAseo },
     { kind: "bool", label: "Luces altas", pick: (e) => e.revLucesAltas },
     { kind: "bool", label: "Luces bajas", pick: (e) => e.revLucesBajas },
@@ -86,6 +86,41 @@ function rowsDefinition(): RowDef[] {
     { kind: "bool", label: "Luz blanca", pick: (e) => e.revLuzBlanca },
 
     { kind: "section", label: "2.EN EL MOMENTO DE ENCENDIDO DEL VEHICULO", align: "center" },
+    // --- Funcionamiento Indicadores y luces ---
+  { kind: "section", label: "A. FUNCIONAMIENTO INDICADORES Y LUCES" },
+  { kind: "bool", label: "Presión de aceite", pick: e => e.indPresionAceite },
+  { kind: "bool", label: "Carga alternador", pick: e => e.indCargaAlternador },
+  { kind: "bool", label: "Temperatura del motor", pick: e => e.indTempMotor },
+  { kind: "bool", label: "Presión de aire frenos", pick: e => e.indPresionAireFrenos },
+  { kind: "bool", label: "Indicador de revoluciones", pick: e => e.indIndicadorRevoluciones },
+  { kind: "bool", label: "Luces principales", pick: e => e.indLucesPrincipales },
+  { kind: "bool", label: "Luz de freno", pick: e => e.indLuzFreno },
+  { kind: "bool", label: "Luces direccionales", pick: e => e.indDireccionales },
+  { kind: "bool", label: "Luz y pito de reversa", pick: e => e.indLuzYPitoReversa },
+  { kind: "bool", label: "Funcionamiento del limpiabrisas", pick: e => e.indLimpiabrisas },
+  { kind: "bool", label: "Pito", pick: e => e.indPito },
+  { kind: "bool", label: "Dispositivo de conT de velocidad", pick: e => e.indControlVelocidad },
+
+  // --- Documentación y elementos de seguridad ---
+  { kind: "section", label: "B. REVISIÓN DE DOCUMENTACIÓN Y ELEMENTOS DE SEGURIDAD" },
+  { kind: "bool", label: "Rev., porte y verificación de fechas (doc.)", pick: e => e.docFechasVigenciaOk },
+  { kind: "bool", label: "Rev., porte y estado del botiquín", pick: e => e.docBotiquinOk },
+  { kind: "bool", label: "Rev., porte y fecha de vencimiento extintor", pick: e => e.docExtintorOk },
+
+  // --- Durante la operación (centrado) ---
+  { kind: "section", label: "3. DURANTE LA OPERACIÓN", align: "center" },
+  { kind: "bool", label: "Ruidos extraños", pick: e => e.opRuidosExtranos },
+  { kind: "bool", label: "Novedades en los indicadores", pick: e => e.opNovedadesIndicadores },
+  { kind: "bool", label: "Otros", pick: e => e.opOtros },
+
+  // --- Después de la operación (centrado) ---
+  { kind: "section", label: "4. DESPUÉS DE LA OPERACIÓN", align: "center" },
+  { kind: "bool", label: "Llantas", pick: e => e.postLlantas },
+  { kind: "bool", label: "Luces", pick: e => e.postLuces },
+  { kind: "bool", label: "Fugas", pick: e => e.postFugas },
+  { kind: "bool", label: "Correas", pick: e => e.postCorreas },
+  { kind: "bool", label: "Estado general del vehículo", pick: e => e.postEstadoGeneral },
+  { kind: "bool", label: "Kilometraje", pick: e => e.postKilometrajeOk },
   ];
   return rows;
 }

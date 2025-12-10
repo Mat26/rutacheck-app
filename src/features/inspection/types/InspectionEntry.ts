@@ -47,4 +47,35 @@ export type InspectionEntry = {
 
   createdAt: number;
   updatedAt?: number;
+
+  indPresionAceite?: boolean;
+  indCargaAlternador?: boolean;
+  indTempMotor?: boolean;
+  indPresionAireFrenos?: boolean;
+  indIndicadorRevoluciones?: boolean;
+  indLucesPrincipales?: boolean;
+  indLuzFreno?: boolean;
+  indDireccionales?: boolean;
+  indLuzYPitoReversa?: boolean;
+  indLimpiabrisas?: boolean;
+  indPito?: boolean;
+  indControlVelocidad?: boolean;
+
+  /** Revisión de documentación y elementos de seguridad */
+  docFechasVigenciaOk?: boolean;
+  docBotiquinOk?: boolean;
+  docExtintorOk?: boolean;
+
+  /** Durante la Operación */
+  opRuidosExtranos?: boolean;
+  opNovedadesIndicadores?: boolean;
+  opOtros?: boolean;
+
+  /** Después de la operación */
+  postLlantas?: boolean;
+  postLuces?: boolean;
+  postFugas?: boolean;
+  postCorreas?: boolean;
+  postEstadoGeneral?: boolean;
+  postKilometrajeOk?: boolean;
 };
