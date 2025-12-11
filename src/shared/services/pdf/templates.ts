@@ -160,16 +160,35 @@ function renderGeneralTable(profile: UserProfile | null, month: string) {
 
 
 /** Tabla principal (matriz) */
-function renderMatrixTable(month: string, rows: InspectionEntry[]) {
+function renderMatrixTable(month: string, rows: InspectionEntry[], profile: UserProfile | null) {
   const totalDays = daysInMonth(month);
   const map = byDayMap(month, rows);
+  const totalCols = 1 + totalDays; // 1 col de ítem + N días
+
+  // Bloque de encabezado que SÍ se repite en todas las páginas
+  const headerBlock = `
+    <tr class="matrix-header-wrapper">
+      <th class="matrix-header-cell" colspan="${totalCols}">
+        <div class="matrix-header-block">
+          ${renderHeaderTable()}
+        </div>
+      </th>
+    </tr>`;
+
+  // Fila de información general (MES, MÓVIL, etc.) SOLO PRIMERA PÁGINA
+  const generalRow = `
+    <tr class="general-row">
+      <td class="general-cell" colspan="${totalCols}">
+        ${renderGeneralTable(profile, month)}
+      </td>
+    </tr>`;
 
   // colgroup para respetar anchos exactos
   const colgroup =
     `<col style="width: var(--item-col)">` +
     Array.from({ length: totalDays }, () => `<col style="width: var(--day-col)">`).join("");
 
-  // 2ª fila de encabezado: etiqueta "DÍA" + números 1..N
+  // Encabezado de días: etiqueta "DÍA" + números 1..N
   const daysHead =
     '<tr class="days-head">' +
       '<th class="item-col">DÍA</th>' +
@@ -179,7 +198,6 @@ function renderMatrixTable(month: string, rows: InspectionEntry[]) {
   const defs = rowsDefinition();
   const body = defs.map((def) => {
     if (def.kind === "section") {
-      // admite centrado si definiste align: "center" en la fila
       const centerClass = (def as any).align === "center" ? " center" : "";
       return `<tr class="section${centerClass}">
                 <td class="section-label" colspan="${1 + totalDays}">${escapeHtml(def.label)}</td>
@@ -196,7 +214,7 @@ function renderMatrixTable(month: string, rows: InspectionEntry[]) {
     return `<tr>${labelCell}${dayCells}</tr>`;
   }).join("");
 
-  // 1ª fila de encabezado: aviso a conductor a TODO lo ancho
+  // Aviso al conductor (lo dejamos en el cuerpo, debajo de la fila general)
   const notice =
     `<tr class="notice">
        <th class="notice-cell" colspan="${1 + totalDays}">
@@ -209,13 +227,53 @@ function renderMatrixTable(month: string, rows: InspectionEntry[]) {
   <table class="matrix">
     <colgroup>${colgroup}</colgroup>
     <thead>
+      ${headerBlock}
+      ${generalRow}
       ${notice}
       ${daysHead}
     </thead>
-    <tbody>${body}</tbody>
+    <tbody>
+      ${body}
+    </tbody>
   </table>`;
 }
 
+
+function renderHeaderTable() {
+  return `
+  <table class="header-table">
+    <tbody>
+      <!-- Fila 1: Logo - Títulos - Versión -->
+      <tr>
+        <td class="header-logo">
+          LOGO CENTRADO
+        </td>
+        <td class="header-main">
+          <div>Servicio con calidad y experiencia</div>
+          <div>SISTEMA GESTIÓN DE CALIDAD</div>
+          <div>FORMATO DE REVISION DIARIA DE VEHICULOS</div>
+        </td>
+        <td class="header-version">
+          Versión: 1
+        </td>
+      </tr>
+
+      <!-- Fila 2: Revisión / Aprobado / Fecha -->
+      <tr class="header-subrow">
+        <td class="header-review">
+          <div>REVISIÓN:</div>
+          <div>Coordinador de Calidad</div>
+        </td>
+        <td class="header-approval">
+          <div>APROBADO: GERENTE</div>
+        </td>
+        <td class="header-date">
+          <div>Fecha de:</div>
+        </td>
+      </tr>
+    </tbody>
+  </table>`;
+}
 
 
 /** Pequeño escape para valores de texto */
@@ -274,8 +332,8 @@ function styles(totalDays: number) {
     h1 { margin: 0 0 6px 0; font-size: 16px; text-align: left; }
 
     /* Info general (horizontal) */
-    .kv { border-collapse: collapse; margin: 4px 0 8px 0; width: 100%; table-layout: fixed; }
-    .kv th, .kv td { border: 1px solid #e5e7eb; padding: 3px 4px; text-align: left; }
+    .kv { border-collapse: collapse; margin: 0; width: 100%; table-layout: fixed; }
+    .kv th, .kv td { border: 1px solid #e5e7eb; padding: 0; text-align: left; }
     .kv.kv-horizontal tbody th { background: #f8fafc; }
     .kv-k { white-space: nowrap; width: 10%; background: #f3f4f6; }
     .kv-v { width: 15%; font-weight: 600; }
@@ -329,6 +387,89 @@ function styles(totalDays: number) {
     }
 
     th, td { word-wrap: break-word; overflow-wrap: anywhere; }
+
+    .header-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0;
+      table-layout: fixed;
+    }
+    .header-table td {
+      border: 1px solid #e5e7eb;
+      padding: 3px 4px;
+      vertical-align: middle;
+    }
+    .header-logo {
+      width: 18%;
+      text-align: center;
+      font-weight: 600;
+      font-size: 11px;
+      white-space: normal;
+    }
+    .header-main {
+      width: 64%;
+      text-align: center;
+      font-weight: 700;
+      line-height: 1.25;
+      font-size: 12px;
+    }
+    .header-main div:nth-child(1) {
+      font-size: 13px;
+      margin-bottom: 2px;
+    }
+    .header-main div:nth-child(2),
+    .header-main div:nth-child(3) {
+      font-size: 11px;
+      text-transform: uppercase;
+    }
+    .header-version {
+      width: 18%;
+      text-align: center;
+      font-size: 11px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .header-subrow td {
+      font-size: 10px;
+      font-weight: 600;
+      text-align: center;
+      line-height: 1.2;
+    }    
+    
+    .matrix-header-wrapper .matrix-header-cell {
+      border-bottom: 1px solid #e5e7eb;
+      padding: 0;
+    }
+    .matrix-header-block {
+      width: 100%;
+    }
+
+    .matrix-header-block .header-table {
+      margin: 0 0 0 0; /* pequeña separación con la tabla general */
+    }
+
+    .matrix-header-block .kv {
+      margin: 0 0 8px 0;
+    }
+
+    .general-row .general-cell {
+      border: 1px;
+      padding: 0;
+    }
+
+    .header-table tr:last-child td {
+      border-bottom: 1px;
+    }
+
+    /* Quitar borde superior de la primera fila de la kv */
+    .kv tr:first-child th,
+    .kv tr:first-child td {
+      border-top: 1px;
+    }
+
+    .notice .notice-cell {
+      border-top: 1px ;
+    }
   </style>`;
 }
 
@@ -347,11 +488,7 @@ export function buildMonthlyHtml(month: string, rows: InspectionEntry[], profile
   </head>
   <body>
     <div class="sheet">
-      <h1>RutaCheck — ${month}</h1>
-
-      ${renderGeneralTable(profile, month)}
-
-      ${renderMatrixTable(month, rows)}
+      ${renderMatrixTable(month, rows, profile)}
     </div>
   </body>
   </html>`;
